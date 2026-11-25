@@ -1,0 +1,9 @@
+{
+  "appId": "id.ac.its.coolsense",
+  "appName": "CoolSense",
+  "webDir": "www",
+  "android": { "backgroundColor": "#E9EFF2" },
+  "plugins": {
+    "StatusBar": { "overlaysWebView": false }
+  }
+}

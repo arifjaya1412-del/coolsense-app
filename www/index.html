@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#E9EFF2" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0E1A21" media="(prefers-color-scheme: dark)">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="CoolSense">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="assets/app.css">
+  <title>CoolSense</title>
+</head>
+<body>
+<div id="app">
+
+  <!-- Memuat -->
+  <section id="layar-memuat" class="layar layar-tengah">
+    <svg class="logo-besar" viewBox="0 0 64 64" aria-hidden="true"><use href="#ikon-logo"/></svg>
+    <p class="redup">Menghubungkan ke CoolSense…</p>
+  </section>
+
+  <!-- Masuk / daftar -->
+  <section id="layar-masuk" class="layar layar-masuk" hidden>
+    <div class="masuk-kepala">
+      <svg class="logo-besar" viewBox="0 0 64 64" aria-hidden="true"><use href="#ikon-logo"/></svg>
+      <h1>CoolSense</h1>
+      <p class="redup">Ruangan sejuk otomatis, kendali di genggaman</p>
+    </div>
+
+    <div class="segmen segmen-kecil" role="tablist">
+      <button type="button" id="tab-masuk" class="aktif" role="tab">Masuk</button>
+      <button type="button" id="tab-daftar" role="tab">Daftar</button>
+    </div>
+
+    <form id="form-auth" novalidate>
+      <label class="isian" id="field-nama" hidden>
+        <span>Nama</span>
+        <input id="in-nama" type="text" autocomplete="name" placeholder="Nama lengkap">
+      </label>
+      <label class="isian">
+        <span>Email</span>
+        <input id="in-email" type="email" inputmode="email" autocomplete="email" placeholder="nama@email.com">
+      </label>
+      <label class="isian">
+        <span>Password</span>
+        <input id="in-pass" type="password" autocomplete="current-password" placeholder="Minimal 6 karakter">
+      </label>
+      <label class="isian" id="field-pass2" hidden>
+        <span>Ulangi password</span>
+        <input id="in-pass2" type="password" autocomplete="new-password">
+      </label>
+      <p id="pesan-auth" class="pesan" role="alert"></p>
+      <button id="btn-auth" class="tombol-utama" type="submit">Masuk</button>
+      <button id="btn-lupa" class="tombol-teks" type="button">Lupa password</button>
+    </form>
+
+    <button id="btn-demo" class="tombol-garis" type="button">Coba tanpa alat (mode demo)</button>
+  </section>
+
+  <!-- Aplikasi utama -->
+  <main id="layar-utama" class="layar layar-utama" hidden>
+    <header class="topbar">
+      <div class="merek">
+        <svg viewBox="0 0 64 64" aria-hidden="true"><use href="#ikon-logo"/></svg>
+        <span>CoolSense</span>
+      </div>
+      <button id="pill-koneksi" class="pill" type="button" data-status="netral">
+        <i></i><span>Memeriksa…</span>
+      </button>
+    </header>
+
+    <!-- Tab Kontrol -->
+    <div id="tab-kontrol" class="panel">
+      <section class="pembacaan" aria-live="polite">
+        <div class="gauge">
+          <svg id="gauge" viewBox="0 0 260 260" aria-hidden="true"></svg>
+          <div class="gauge-isi">
+            <div class="angka"><span id="nilai-suhu">–</span><small>°C</small></div>
+            <div id="zona" class="zona">Menunggu data</div>
+            <div class="rh">Kelembapan <b id="nilai-rh">–</b></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="daya">
+        <button id="btn-power" class="power" type="button" aria-pressed="false" aria-label="Nyalakan pendingin">
+          <span class="power-cincin"></span>
+          <svg viewBox="0 0 48 48" aria-hidden="true">
+            <path d="M24 6v17" />
+            <path d="M14.2 12.6a15 15 0 1 0 19.6 0" />
+          </svg>
+        </button>
+        <h2 id="power-judul">Pendingin mati</h2>
+        <p id="power-sub" class="redup">–</p>
+      </section>
+
+      <section class="kartu">
+        <div class="kartu-judul">
+          <h3>Mode</h3>
+        </div>
+        <div class="segmen" role="radiogroup" aria-label="Mode pendingin">
+          <button type="button" data-mode="auto" role="radio">Otomatis</button>
+          <button type="button" data-mode="manual" role="radio">Manual</button>
+        </div>
+        <p id="mode-ket" class="ket"></p>
+      </section>
+
+      <section class="kartu">
+        <div class="kartu-judul">
+          <h3>Koneksi ke ruangan</h3>
+          <span id="koneksi-waktu" class="redup kecil"></span>
+        </div>
+        <div class="rantai" id="rantai">
+          <div class="simpul" data-node="hp">
+            <span class="bulat"><svg viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.2"/><path d="M11 18.5h2"/></svg></span>
+            <b>Aplikasi</b><small id="ket-hp">–</small>
+          </div>
+          <span class="tali" data-link="hp"></span>
+          <div class="simpul" data-node="cloud">
+            <span class="bulat"><svg viewBox="0 0 24 24"><path d="M7 18.5h10.5a4 4 0 0 0 .6-8 6 6 0 0 0-11.6 1.6A3.3 3.3 0 0 0 7 18.5Z"/></svg></span>
+            <b>Firebase</b><small id="ket-cloud">–</small>
+          </div>
+          <span class="tali" data-link="cloud"></span>
+          <div class="simpul" data-node="esp">
+            <span class="bulat"><svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1.5"/><path d="M9 2.5v3.5M15 2.5v3.5M9 18v3.5M15 18v3.5M2.5 9H6M2.5 15H6M18 9h3.5M18 15h3.5"/></svg></span>
+            <b>ESP32</b><small id="ket-esp">–</small>
+          </div>
+          <span class="tali" data-link="esp"></span>
+          <div class="simpul" data-node="plant">
+            <span class="bulat"><svg viewBox="0 0 24 24"><path d="M3.5 11 12 4l8.5 7"/><path d="M5.5 9.5V20h13V9.5"/><path d="M12 11.5v5.5M9.6 12.8l4.8 2.8M14.4 12.8l-4.8 2.8"/></svg></span>
+            <b>Ruangan</b><small id="ket-plant">–</small>
+          </div>
+        </div>
+        <p id="koneksi-ket" class="ket"></p>
+      </section>
+
+      <section id="panel-demo" class="kartu kartu-demo" hidden>
+        <div class="kartu-judul"><h3>Mode demo</h3></div>
+        <p class="ket">Data dibuat aplikasi, bukan dari ESP32. Ubah temperatur ruangan untuk mencoba mode Otomatis.</p>
+        <div class="baris-tombol">
+          <button type="button" id="demo-panas" class="tombol-garis">+2 °C</button>
+          <button type="button" id="demo-dingin" class="tombol-garis">−2 °C</button>
+        </div>
+      </section>
+    </div>
+
+    <!-- Tab Riwayat -->
+    <div id="tab-riwayat" class="panel" hidden>
+      <h1 class="judul-tab">Riwayat temperatur</h1>
+      <section class="kartu">
+        <div class="grafik-wadah"><canvas id="grafik"></canvas></div>
+        <p id="grafik-kosong" class="ket">Grafik terisi setelah data pertama masuk dari ESP32.</p>
+      </section>
+      <section class="statistik">
+        <div><small>Terendah</small><b id="st-min">–</b></div>
+        <div><small>Rata-rata</small><b id="st-avg">–</b></div>
+        <div><small>Tertinggi</small><b id="st-max">–</b></div>
+      </section>
+      <p id="st-ac" class="ket ket-tengah"></p>
+    </div>
+
+    <!-- Tab Atur -->
+    <div id="tab-atur" class="panel" hidden>
+      <h1 class="judul-tab">Pengaturan</h1>
+
+      <section class="kartu">
+        <div class="kartu-judul"><h3>Batas temperatur mode Otomatis</h3></div>
+        <div class="slider">
+          <div class="slider-kepala"><span>Nyala di atas</span><b id="lbl-atas">27,0 °C</b></div>
+          <div class="slider-baris">
+            <button type="button" class="langkah" data-target="atas" data-d="-0.5" aria-label="Turunkan batas atas">−</button>
+            <input id="sl-atas" type="range" min="21" max="40" step="0.5" value="27" aria-label="Batas atas">
+            <button type="button" class="langkah" data-target="atas" data-d="0.5" aria-label="Naikkan batas atas">+</button>
+          </div>
+        </div>
+        <div class="slider">
+          <div class="slider-kepala"><span>Mati di bawah</span><b id="lbl-bawah">25,0 °C</b></div>
+          <div class="slider-baris">
+            <button type="button" class="langkah" data-target="bawah" data-d="-0.5" aria-label="Turunkan batas bawah">−</button>
+            <input id="sl-bawah" type="range" min="20" max="39" step="0.5" value="25" aria-label="Batas bawah">
+            <button type="button" class="langkah" data-target="bawah" data-d="0.5" aria-label="Naikkan batas bawah">+</button>
+          </div>
+        </div>
+        <p class="ket">Selisih minimal 1 °C agar relay tidak menyala-mati terus-menerus. Nilai bawaan 27 °C dan 25 °C mengikuti batas nyaman SNI 03-6572-2001.</p>
+        <button type="button" id="btn-reset" class="tombol-garis lebar">Kembalikan ke 27 °C dan 25 °C</button>
+      </section>
+
+      <section class="kartu">
+        <div class="kartu-judul"><h3>Perangkat ESP32</h3></div>
+        <dl class="daftar">
+          <div><dt>Status</dt><dd id="dv-status">–</dd></div>
+          <div><dt>Sinyal Wi-Fi</dt><dd id="dv-rssi">–</dd></div>
+          <div><dt>Alamat IP</dt><dd id="dv-ip">–</dd></div>
+          <div><dt>Menyala selama</dt><dd id="dv-uptime">–</dd></div>
+          <div><dt>Sensor DHT22</dt><dd id="dv-sensor">–</dd></div>
+          <div><dt>Data terakhir</dt><dd id="dv-terakhir">–</dd></div>
+        </dl>
+      </section>
+
+      <section class="kartu">
+        <div class="kartu-judul"><h3>Akun</h3></div>
+        <dl class="daftar">
+          <div><dt>Nama</dt><dd id="akun-nama">–</dd></div>
+          <div><dt>Email</dt><dd id="akun-email">–</dd></div>
+        </dl>
+        <button type="button" id="btn-keluar" class="tombol-garis lebar bahaya">Keluar</button>
+      </section>
+      <p class="ket ket-tengah redup">CoolSense 1.0, Arif Jaya Mulia Simangunsong, 5B</p>
+    </div>
+
+    <nav class="tabbar" aria-label="Navigasi">
+      <button type="button" data-tab="kontrol" class="aktif">
+        <svg viewBox="0 0 24 24"><path d="M12 3v8"/><path d="M7 6.3a8 8 0 1 0 10 0"/></svg><span>Kontrol</span>
+      </button>
+      <button type="button" data-tab="riwayat">
+        <svg viewBox="0 0 24 24"><path d="M3.5 19.5h17"/><path d="m5 15 4.5-5 3.5 3 6-7"/></svg><span>Riwayat</span>
+      </button>
+      <button type="button" data-tab="atur">
+        <svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg><span>Atur</span>
+      </button>
+    </nav>
+  </main>
+
+  <div id="toast" role="status"></div>
+</div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="ikon-logo" viewBox="0 0 64 64">
+    <rect width="64" height="64" rx="16" fill="#123A52"/>
+    <path d="M32 13v18" stroke="#8FD3FF" stroke-width="5" stroke-linecap="round" fill="none"/>
+    <path d="M21.5 20.5a16 16 0 1 0 21 0" stroke="#8FD3FF" stroke-width="5" stroke-linecap="round" fill="none"/>
+  </symbol>
+</svg>
+
+<script type="module" src="assets/app.js"></script>
+</body>
+</html>

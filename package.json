@@ -1,0 +1,24 @@
+{
+  "name": "coolsense-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Aplikasi CoolSense untuk Android dan iPhone",
+  "scripts": {
+    "build": "esbuild src/main.js --bundle --format=esm --minify --target=es2021 --outdir=www/assets --entry-names=app --asset-names=[name]-[hash] --loader:.woff2=file --loader:.woff=file",
+    "dev": "npm run build && npx serve www"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.6.2",
+    "@capacitor/core": "8.6.2",
+    "@capacitor/haptics": "8.0.2",
+    "@capacitor/status-bar": "8.0.4",
+    "@fontsource/sora": "^5.2.0",
+    "chart.js": "4.6.2",
+    "firebase": "13.4.0"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "4.0.0",
+    "@capacitor/cli": "8.6.2",
+    "esbuild": "0.28.2"
+  }
+}
