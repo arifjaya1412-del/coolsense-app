@@ -1,4 +1,4 @@
-# Membangun APK Android dan versi web (untuk iPhone) setiap kali kode diunggah ke GitHub.
+# Membangun APK Android, IPA iPhone, dan versi web setiap kali kode diunggah ke GitHub.
 name: Build CoolSense
 
 on:
@@ -34,7 +34,7 @@ jobs:
       - uses: android-actions/setup-android@v3
         with:
           packages: platform-tools
-          
+
       - name: Pasang paket
         run: npm install --no-audit --no-fund
 
@@ -73,8 +73,8 @@ jobs:
         run: |
           gh release delete apk-terbaru --yes --cleanup-tag || true
           gh release create apk-terbaru CoolSense.apk \
-            --title "CoolSense APK terbaru" \
-            --notes "Dibuat otomatis dari commit ${{ github.sha }}. Unduh CoolSense.apk di bawah lalu pasang di HP Android." \
+            --title "CoolSense terbaru (Android dan iPhone)" \
+            --notes "Dibuat otomatis dari commit ${{ github.sha }}. CoolSense.apk untuk Android. CoolSense.ipa untuk iPhone, dipasang lewat Sideloadly." \
             --prerelease
 
   web:
@@ -97,3 +97,55 @@ jobs:
           path: www
       - id: deploy
         uses: actions/deploy-pages@v4
+
+  ios:
+    name: IPA iPhone
+    runs-on: macos-latest
+    needs: android
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Pasang paket
+        run: npm install --no-audit --no-fund
+
+      - name: Bangun tampilan aplikasi
+        run: npm run build
+
+      - name: Buat proyek iOS
+        run: npx cap add ios
+
+      - name: Pasang ikon iOS
+        run: npx capacitor-assets generate --ios --iconBackgroundColor "#123A52" --splashBackgroundColor "#E9EFF2" --splashBackgroundColorDark "#0E1A21"
+
+      - name: Salin tampilan ke iOS
+        run: npx cap sync ios
+
+      - name: Bangun aplikasi iPhone (tanpa tanda tangan)
+        working-directory: ios/App
+        run: |
+          xcodebuild -list -project App.xcodeproj
+          xcodebuild -project App.xcodeproj -scheme App -configuration Release \
+            -sdk iphoneos -destination "generic/platform=iOS" \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            build
+
+      - name: Kemas menjadi CoolSense.ipa
+        run: |
+          mkdir -p Payload
+          cp -R ios/App/build/Build/Products/Release-iphoneos/App.app Payload/
+          zip -qr CoolSense.ipa Payload
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CoolSense-ipa
+          path: CoolSense.ipa
+
+      - name: Tambahkan IPA ke halaman Releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload apk-terbaru CoolSense.ipa --clobber
